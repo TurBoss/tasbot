@@ -61,7 +61,7 @@ class MainApp(Daemon, plugin.ThreadContainer):
 			return False
 	
 	def is_me(self, username):
-		return self.config.get('tasbot', "nick") == username
+		return self.config.get(self.section, "nick") == username
 
 	def do_login(self):
 		"""handle tasserver login"""
@@ -70,14 +70,14 @@ class MainApp(Daemon, plugin.ThreadContainer):
 			return
 		if self.verbose:
 			Log.notice("Logging in...")
-		phash = utilities.hash_password(self.config.get('tasbot', "password"))
-		self.tasclient.login(self.config.get('tasbot', "nick"), phash,
-				"Newbot", 2400, self.config.get('tasbot', "lanip", "*"))
+		phash = utilities.hash_password(self.config.get(self.section, "password"))
+		self.tasclient.login(self.config.get(self.section, "nick"), phash,
+				"Newbot", 2400, self.config.get(self.section, "lanip", "*"))
 
 	def register(self, username, password):
 		"""register new account on tasserver"""
-		phash = utilities.hash_password(self.config.get('tasbot', "password"))
-		self.tasclient.register(self.config.get('tasbot', "nick"), phash)
+		phash = utilities.hash_password(self.config.get(self.section, "password"))
+		self.tasclient.register(self.config.get(self.section, "nick"), phash)
 
 	def destroy(self):
 		"""deprecated"""
@@ -88,11 +88,12 @@ class MainApp(Daemon, plugin.ThreadContainer):
 	def reload_config(self):
 		"""reload config and admins from file"""
 		self.config = config.Config(self.configfile)
-		self.admins = self.config.get_optionlist('tasbot', "admins")
+		self.admins = self.config.get_optionlist(self.section, "admins")
 
-	def __init__(self, configfile, pidfile, register, verbose):
+	def __init__(self, configfile, pidfile, register, verbose, section = 'tasbot'):
 		"""default init and plugin loading"""
 		super(MainApp, self).__init__(pidfile)
+		self.section = section
 		self.firstconnect = 1
 		self.er = 0
 		self.connected = False
@@ -100,12 +101,12 @@ class MainApp(Daemon, plugin.ThreadContainer):
 		self.ph = plugin.PluginHandler(self)
 		self.configfile = configfile
 		self.reload_config()
-		self.config.set('tasbot', 'cfg_dir', self.cwd)
+		self.config.set(section, 'cfg_dir', self.cwd)
 		self.verbose = verbose
 		self.reg = register
 		self.tasclient = client.Tasclient(self)
 
-		for p in self.config.get_optionlist('tasbot', "plugins"):
+		for p in self.config.get_optionlist(section, "plugins"):
 			self.ph.addplugin(p, self.tasclient)
 
 		self.tasclient.events.onconnectedplugin = self.ph.onconnected
@@ -125,10 +126,10 @@ class MainApp(Daemon, plugin.ThreadContainer):
 		while not self.dying:
 			try:
 				Log.notice("Connecting to %s:%i" %
-						(self.config.get('tasbot', "serveraddr"),
-						int(self.config.get('tasbot', "serverport"))))
-				self.tasclient.connect(self.config.get('tasbot', "serveraddr"),
-						int(self.config.get('tasbot', "serverport")))
+						(self.config.get(self.section, "serveraddr"),
+						int(self.config.get(self.section, "serverport"))))
+				self.tasclient.connect(self.config.get(self.section, "serveraddr"),
+						int(self.config.get(self.section, "serverport")))
 				while not self.dying:
 					time.sleep(10)
 			except SystemExit:

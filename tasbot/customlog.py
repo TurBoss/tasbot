@@ -35,7 +35,10 @@ class ILogger(object):
 		return msg
 
 	def error(self, msg,prefix=None):
-		self._logger.error( self._prepare( msg,prefix ) )
+		if hasattr(self,'_logger'):
+			self._logger.error( self._prepare( msg,prefix ) )
+		else:
+			print("%s:%s" % (str(prefix), str(msg)))
 
 	def debug(self, msg,prefix=None):
 		self._logger.debug( self._prepare( msg,prefix ) )
@@ -44,7 +47,10 @@ class ILogger(object):
 
 	def exception(self,e):
 		#TODO needs prefix handling
-		self._logger.exception( e )
+		if hasattr(self,'_logger'):
+			self._logger.exception( e )
+		else:
+			print("Exception: %s" % (str(e)))
 
 	def loaded(self,t):
 		self.info( t, "LOADED" )

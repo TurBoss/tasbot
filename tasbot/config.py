@@ -27,13 +27,12 @@ class Config(object):
 			open(filename, 'r').close()
 			self._config.read(filename)
 		except Exception, e:
-			try:
-				Log.error("Configfile %s invalid" % self.filename)
-				Log.exception(e)
-			except AttributeError, e:
-				print('Error reading configfile %s and Logging not initialized' %
-						filename)
-			raise SystemExit(1)
+			#try:
+			Log.error("Configfile %s invalid" % self._filename)
+			Log.exception(e)
+			#except AttributeError, e:
+			#	print('Error reading configfile %s and Logging not initialized: %s' % (filename, e))
+			#raise SystemExit(1)
 
 	def get(self, section, key, default=None):
 		#find out reason why int keys fail to load
