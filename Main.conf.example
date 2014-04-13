@@ -1,4 +1,4 @@
-serveraddr=springrts.com
+serveraddr=lobby.springrts.com
 #serveraddr=localhost
 serverport=8200
 admins=YOURNICK
